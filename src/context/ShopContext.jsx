@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { createContext } from "react";
+import { useState, createContext,useEffect } from "react";
 import { PRODUCTS } from "../products";
 
 export const ShopContext = createContext(null);
@@ -12,7 +11,10 @@ const getDefaultCart = () => {
   return cart;
 };
 export const ShopContextProvider = (props) => {
-  const [cartItems, setCartItems] = useState(getDefaultCart());
+  const [cartItems, setCartItems] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : getDefaultCart();
+  });
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
@@ -22,6 +24,8 @@ export const ShopContextProvider = (props) => {
     }
     return totalAmount;
   }
+    const [orderInfo, setOrderInfo] = useState(null);
+
   const addToCart = (itemId) => {
     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
   };
@@ -33,14 +37,23 @@ export const ShopContextProvider = (props) => {
     setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
   };
   const removeItemFromCart = (id) => {
-      console.log("Removing item from cart with ID:", id);
-
     setCartItems((prevItems) => {
       const updatedCart = { ...prevItems };
       delete updatedCart[id];
       return updatedCart;
     });
   };
+
+   const submitOrder = (formData) => {
+     console.log("Submitting order:", formData);
+     setOrderInfo(formData);
+     setCartItems(getDefaultCart());
+  };
+  
+    useEffect(() => {
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+    }, [cartItems]);
+
 
   const contextValue = {
     cartItems,
@@ -49,11 +62,13 @@ export const ShopContextProvider = (props) => {
     updateCartItemCount,
     removeItemFromCart,
     getTotalCartAmount,
+    submitOrder,
+    orderInfo,
   };
-  console.log(cartItems);
   return (
     <ShopContext.Provider value={contextValue}>
       {props.children}
     </ShopContext.Provider>
   );
 };
+ 
