@@ -11,33 +11,33 @@ const getDefaultCart = () => {
   return cart;
 };
 export const ShopContextProvider = (props) => {
-  const [cartItems, setCartItems] = useState(() => {
+  const [cartItemsQuantity, setcartItemsQuantity] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : getDefaultCart();
   });
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
-    for (const item in cartItems) {
+    for (const item in cartItemsQuantity) {
       let itemInfo = PRODUCTS.find((product) => product.id === Number(item));
-      totalAmount+=cartItems[item]*itemInfo.price
+      totalAmount+=cartItemsQuantity[item]*itemInfo.price
     }
     return totalAmount;
   }
     const [orderInfo, setOrderInfo] = useState(null);
 
   const addToCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+    setcartItemsQuantity((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
   };
 
   const decreaseItemFromCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    setcartItemsQuantity((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
   };
   const updateCartItemCount = (newAmount, itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
+    setcartItemsQuantity((prev) => ({ ...prev, [itemId]: newAmount }));
   };
   const removeItemFromCart = (id) => {
-    setCartItems((prevItems) => {
+    setcartItemsQuantity((prevItems) => {
       const updatedCart = { ...prevItems };
       delete updatedCart[id];
       return updatedCart;
@@ -45,18 +45,17 @@ export const ShopContextProvider = (props) => {
   };
 
    const submitOrder = (formData) => {
-     console.log("Submitting order:", formData);
      setOrderInfo(formData);
-     setCartItems(getDefaultCart());
+     setcartItemsQuantity(getDefaultCart());
   };
   
     useEffect(() => {
-      localStorage.setItem("cart", JSON.stringify(cartItems));
-    }, [cartItems]);
+      localStorage.setItem("cart", JSON.stringify(cartItemsQuantity));
+    }, [cartItemsQuantity]);
 
 
   const contextValue = {
-    cartItems,
+    cartItemsQuantity,
     addToCart,
     decreaseItemFromCart,
     updateCartItemCount,
